@@ -15,7 +15,7 @@ import {
   Send,
   Eye,
   Zap,
-  ShieldCheck // 信頼感アイコンに変更
+  ShieldCheck
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 
@@ -106,7 +106,6 @@ export default function MitsumoriLP() {
               </div>
             </motion.div>
 
-            {/* ★修正：キャッチコピーを機能的・具体的に変更 */}
             <motion.h1 variants={fadeInUp} className="text-4xl md:text-6xl font-extrabold leading-tight mb-8 tracking-tight text-slate-900 drop-shadow-sm">
               「見積もり提出後の追客」と<br />
               「アフターフォロー」を、<br />
@@ -132,7 +131,6 @@ export default function MitsumoriLP() {
               </div>
             </motion.div>
 
-            {/* ターゲット明確化：屋根を追加 */}
             <motion.p variants={fadeInUp} className="text-sm md:text-base text-slate-500 mb-10 font-medium">
               <span className="bg-slate-100 px-3 py-1 rounded text-slate-600">対象</span> <strong className="text-slate-700">外壁塗装・屋根工事</strong>の中小企業で、営業・事務の人手が足りない会社向け
             </motion.p>
@@ -365,7 +363,6 @@ export default function MitsumoriLP() {
             </p>
           </motion.div>
 
-          {/* ★修正：怪しい数字を削除し、「取りこぼしゼロ」という確実なメリットに変更 */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -377,73 +374,76 @@ export default function MitsumoriLP() {
             </div>
             <div className="text-left">
               <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-1">SYSTEM MERIT</p>
-              <p className="font-bold text-lg">
+              <p className="font-bold text-lg leading-snug">
                 追客の取りこぼし <span className="text-emerald-400 text-xl">0件</span> / 精神的負担 <span className="text-emerald-400 text-xl">ゼロ</span>
-                <span className="text-xs font-normal text-slate-500 ml-2">※システムによる自動化</span>
+                {/* 修正：ここで改行し、注釈をブロック要素にする */}
+                <span className="block text-xs font-normal text-slate-400 mt-1">※システムによる自動化</span>
               </p>
             </div>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="bg-white text-slate-900 rounded-3xl p-10 max-w-lg mx-auto shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-10 py-1 rotate-45 translate-x-8 translate-y-4 shadow-sm">
-              RECOMMENDED
-            </div>
-
-            {/* 先着30社に固定 */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg ring-4 ring-white">
+          {/* 修正：バッジ見切れ防止のため、カード全体をwrapするdivを作成 */}
+          <div className="relative max-w-lg mx-auto">
+            {/* 修正：バッジをカードの外に出す */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg ring-4 ring-white z-20">
               先着30社限定
             </div>
-            
-            <div className="text-center border-b border-slate-100 pb-8 mb-8 mt-4">
-              <p className="text-slate-400 mb-2 line-through">通常月額 ¥49,800</p>
-              <div className="flex items-baseline justify-center gap-2 text-slate-900">
-                <span className="text-2xl font-bold">¥</span>
-                <span className="text-6xl font-extrabold text-emerald-500 tracking-tight">24,800</span>
-                <span className="text-lg font-normal text-slate-500 ml-2">/月</span>
-              </div>
-              <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ 今登録すれば、一生この価格です。</p>
-            </div>
 
-            <ul className="space-y-4 mb-10">
-              {[
-                "スナイパービュー（閲覧解析）",
-                "LINE・メール自動追客",
-                "Web見積書 発行し放題",
-                "S・A・B・C 顧客ランクAI判定",
-                "施工後10年間の自動アフターフォロー"
-              ].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
-                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            {/* フォーム前に対象を再確認（屋根追加） */}
-            <p className="text-xs text-center text-slate-500 mb-4">
-              対象：外壁塗装・屋根工事の中小で、見積後の追客が弱い会社向け
-            </p>
-
-            <a 
-              href={FORM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xl text-center py-5 rounded-xl transition shadow-xl relative overflow-hidden group"
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="bg-white text-slate-900 rounded-3xl p-10 shadow-2xl relative overflow-hidden z-10"
             >
-              <span className="relative z-10">モニター枠を押さえる</span>
-              <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-white/10 skew-x-[-20deg] group-hover:animate-[shimmer_1s_infinite]"></div>
-            </a>
-            <div className="text-center text-slate-500 text-xs mt-4 space-y-1">
-              <p>※ 1月上旬のリリース時にご案内をお送りします。</p>
-              <p>※ 費用は導入するまで発生しません。</p>
-              <p>※ LINE自動送信には別途LINE公式アカウント（無料プラン〜）が必要です。</p>
-            </div>
-          </motion.div>
+              <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-10 py-1 rotate-45 translate-x-8 translate-y-4 shadow-sm">
+                RECOMMENDED
+              </div>
+
+              <div className="text-center border-b border-slate-100 pb-8 mb-8 mt-4">
+                <p className="text-slate-400 mb-2 line-through">通常月額 ¥49,800</p>
+                <div className="flex items-baseline justify-center gap-2 text-slate-900">
+                  <span className="text-2xl font-bold">¥</span>
+                  <span className="text-6xl font-extrabold text-emerald-500 tracking-tight">24,800</span>
+                  <span className="text-lg font-normal text-slate-500 ml-2">/月</span>
+                </div>
+                <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ 今登録すれば、一生この価格です。</p>
+              </div>
+
+              <ul className="space-y-4 mb-10">
+                {[
+                  "スナイパービュー（閲覧解析）",
+                  "LINE・メール自動追客",
+                  "Web見積書 発行し放題",
+                  "S・A・B・C 顧客ランクAI判定",
+                  "施工後10年間の自動アフターフォロー"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
+                    <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <p className="text-xs text-center text-slate-500 mb-4">
+                対象：外壁塗装・屋根工事の中小で、見積後の追客が弱い会社向け
+              </p>
+
+              <a 
+                href={FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xl text-center py-5 rounded-xl transition shadow-xl relative overflow-hidden group"
+              >
+                <span className="relative z-10">モニター枠を押さえる</span>
+                <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-white/10 skew-x-[-20deg] group-hover:animate-[shimmer_1s_infinite]"></div>
+              </a>
+              <div className="text-center text-slate-500 text-xs mt-4 space-y-1">
+                <p>※ 1月上旬のリリース時にご案内をお送りします。</p>
+                <p>※ 費用は導入するまで発生しません。</p>
+                <p>※ LINE自動送信には別途LINE公式アカウント（無料プラン〜）が必要です。</p>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
