@@ -50,6 +50,7 @@ const floating: Variants = {
   }
 };
 
+
 export default function MitsumoriLP() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 overflow-x-hidden">
