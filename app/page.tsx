@@ -11,7 +11,6 @@ import {
   History,
   MessageCircle,
   HeartHandshake,
-  Sparkles,
   Send,
   Eye,
   Zap,
@@ -19,10 +18,8 @@ import {
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 
-// GoogleフォームURL
 const FORM_URL = "https://forms.gle/biQeiJtD1bSkLrSeA";
 
-// アニメーション設定
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { 
@@ -42,7 +39,6 @@ const staggerContainer: Variants = {
   }
 };
 
-// 浮遊アニメーション
 const floating: Variants = {
   animate: {
     y: [0, -8, 0],
@@ -73,7 +69,7 @@ export default function MitsumoriLP() {
             rel="noopener noreferrer"
             className="hidden md:flex bg-slate-900 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-800 transition shadow-lg shadow-slate-900/20 items-center gap-2"
           >
-            <span>事前登録（特典あり）</span>
+            <span>モニターに応募する</span>
             <ArrowRight size={14} />
           </a>
         </div>
@@ -81,7 +77,6 @@ export default function MitsumoriLP() {
 
       {/* Hero Section */}
       <section className="relative pt-36 pb-20 px-6 overflow-hidden">
-        {/* Background Decoration */}
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-40"></div>
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-100/40 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 -z-10"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3 -z-10"></div>
@@ -93,7 +88,7 @@ export default function MitsumoriLP() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            {/* バッジエリア */}
+            {/* バッジ */}
             <motion.div variants={fadeInUp} className="flex justify-center gap-3 mb-6">
               <div className="inline-flex items-center gap-2 border border-amber-200 bg-amber-50/90 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-sm ring-2 ring-amber-100">
                 <span className="relative flex h-2.5 w-2.5">
@@ -101,20 +96,23 @@ export default function MitsumoriLP() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                 </span>
                 <span className="text-xs md:text-sm font-bold text-amber-800 tracking-wide">
-                  先着30社・半額固定・1月優先案内
+                  先着30社・12ヶ月半額モニター募集中
                 </span>
               </div>
             </motion.div>
 
-            <motion.h1 variants={fadeInUp} className="text-4xl md:text-6xl font-extrabold leading-tight mb-8 tracking-tight text-slate-900 drop-shadow-sm">
-              「見積もり提出後の追客」と<br />
-              「アフターフォロー」を、<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-800">AIで完全自動化</span>
-              する。
+            {/* ★ここを修正: 「完全放置」訴求へ */}
+            <motion.h1 variants={fadeInUp} className="text-3xl md:text-5xl font-extrabold leading-tight mb-8 tracking-tight text-slate-900 drop-shadow-sm">
+              見積もりは<span className="text-emerald-600">見える化</span>、<br className="hidden md:block" />
+              施工後は追客を<span className="text-emerald-600">自動化</span>。
             </motion.h1>
 
-            {/* ステップ図 */}
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-sm md:text-lg font-bold text-slate-700 mb-8 bg-white/80 backdrop-blur-md py-4 px-8 rounded-full border border-slate-200 inline-flex shadow-md">
+            <motion.p variants={fadeInUp} className="text-base md:text-lg text-slate-600 mb-10 font-medium max-w-3xl mx-auto leading-relaxed">
+              見積もり後は、お客様の閲覧状況を可視化して<span className="font-bold text-slate-800">「本気度」</span>がわかるように。<br className="hidden md:block" />
+              施工後は、点検連絡や保証前のお知らせを自動で送り、<span className="font-bold text-slate-800">リピートと紹介獲得</span>につなげます。
+            </motion.p>
+            {/* ステップ図 (通知を削除し、ログ確認へ変更) */}
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-sm md:text-lg font-bold text-slate-700 mb-12 bg-white/80 backdrop-blur-md py-4 px-8 rounded-full border border-slate-200 inline-flex shadow-md">
               <div className="flex items-center gap-2">
                 <Send size={20} className="text-slate-400" />
                 <span>URLを送る</span>
@@ -122,17 +120,17 @@ export default function MitsumoriLP() {
               <ArrowRight size={20} className="text-slate-300" />
               <div className="flex items-center gap-2">
                 <Eye size={20} className="text-blue-500" />
-                <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded">読まれ具合が見える</span>
+                <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded">既読が分かる</span>
               </div>
               <ArrowRight size={20} className="text-slate-300" />
               <div className="flex items-center gap-2">
                 <Zap size={20} className="text-emerald-500" />
-                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">自動で追客</span>
+                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">勝手に追客</span>
               </div>
             </motion.div>
 
             <motion.p variants={fadeInUp} className="text-sm md:text-base text-slate-500 mb-10 font-medium">
-              <span className="bg-slate-100 px-3 py-1 rounded text-slate-600">対象</span> <strong className="text-slate-700">外壁塗装・屋根工事</strong>の中小企業で、営業・事務の人手が足りない会社向け
+              <span className="bg-slate-100 px-3 py-1 rounded text-slate-600">対象</span> <strong>外壁塗装・屋根工事</strong>で、営業が苦手・忙しくて手が回らない会社向け
             </motion.p>
 
             {/* CTAボタン */}
@@ -144,13 +142,13 @@ export default function MitsumoriLP() {
                 className="group relative bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold px-10 py-4 rounded-full transition-all shadow-xl shadow-emerald-600/30 hover:shadow-emerald-600/40 transform hover:-translate-y-0.5 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  まずは無料で試す
+                  モニターに応募する
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 </span>
                 <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] animate-[shimmer_3s_infinite]"></div>
               </a>
               <a 
-                href="#timeline"
+                href="#features"
                 className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-lg font-bold px-10 py-4 rounded-full transition flex items-center justify-center shadow-sm hover:shadow-md"
               >
                 機能を見る
@@ -188,21 +186,20 @@ export default function MitsumoriLP() {
       <section id="timeline" className="py-24 px-6 bg-slate-50/80 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-20"
-            >
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             className="text-center mb-20"
+           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
-              24時間365日、顧客を見守り続ける。
+              契約前から10年後まで、<br className="md:hidden"/>システムが「顧客」を離さない。
             </h2>
             <p className="text-slate-600 text-lg">
-              契約前から10年後まで。あなたの代わりに「最適なアクション」を自動実行します。
+              あなたは「現場」に集中してください。面倒な事務連絡はすべて自動化します。
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Arrows */}
             <div className="hidden md:block absolute top-16 left-1/3 -translate-x-1/2 text-slate-300 z-0"><ArrowRight size={32} /></div>
             <div className="hidden md:block absolute top-16 left-2/3 -translate-x-1/2 text-slate-300 z-0"><ArrowRight size={32} /></div>
 
@@ -218,9 +215,9 @@ export default function MitsumoriLP() {
                 <Search size={32} />
               </div>
               <div className="inline-block bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-4">STEP 1</div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">決まる客が分かる</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">読んだか分かる</h3>
               <p className="text-slate-600 leading-relaxed">
-                見積書の閲覧状況をリアルタイム解析。「今、金額で迷っている」その瞬間を逃さず通知します。
+                見積書URLがクリックされたら、管理画面に履歴が残ります。「ちゃんと見てくれたかな？」とモヤモヤする必要はもうありません。
               </p>
             </motion.div>
 
@@ -236,9 +233,9 @@ export default function MitsumoriLP() {
                 <MessageCircle size={32} />
               </div>
               <div className="inline-block bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full mb-4">STEP 2</div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">追客が勝手に進む</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">自動でリマインド</h3>
               <p className="text-slate-600 leading-relaxed">
-                着工までの不安な時期に、必要な情報を自動でLINE送信。信頼関係を深め、キャンセルを防ぎます。
+                反応がないお客様には、システムが自動でLINEを送信。「返事まだですか？」と電話するストレスから解放されます。
               </p>
             </motion.div>
 
@@ -254,9 +251,9 @@ export default function MitsumoriLP() {
                 <HeartHandshake size={32} />
               </div>
               <div className="inline-block bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-4">STEP 3</div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">リピートが自動で生まれる</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">アフターも全自動</h3>
               <p className="text-slate-600 leading-relaxed">
-                1年点検や台風後の案内を自動スケジューリング。忘れていても、勝手にリピートを掘り起こします。
+                1年点検や台風後の案内も自動スケジューリング。あなたが忘れていても、勝手にリピートを掘り起こします。
               </p>
             </motion.div>
           </div>
@@ -274,8 +271,8 @@ export default function MitsumoriLP() {
           >
             <span className="text-emerald-500 font-bold tracking-widest uppercase text-sm">FEATURES</span>
             <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-6 text-slate-900">
-              「見えない」を<span className="text-emerald-500">「見える」</span>に変える。<br/>
-              具体的な3つの機能。
+              人件費の<span className="text-emerald-500">10分の1以下のコスト</span>で、<br />
+              抜け漏れのない追客体制を。
             </h2>
           </motion.div>
 
@@ -288,40 +285,40 @@ export default function MitsumoriLP() {
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 md:order-2">
               <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 mb-6"><MousePointerClick size={24} /></div>
-              <h3 className="text-3xl font-bold mb-4 text-slate-900">スマホ専用「Web見積書」</h3>
+              <h3 className="text-3xl font-bold mb-4 text-slate-900">Web見積書で「差別化」</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                PDFを送る時代は終わりました。お客様のスマホで見やすく、操作できる「Webページ」として見積もりを発行。<br/>
-                松竹梅のプラン比較や、カラーシミュレーションでお客様を没入させます。
+                他社が紙やメールで送っている中、あなたは「スマホで見やすい専用ページ」を送れます。<br/>
+                会社情報やLINE相談ボタンも自動でセット。信頼感が違います。
               </p>
               <ul className="space-y-3 text-slate-700 font-medium">
-                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-emerald-500" /> 入力は3分。いつものPDFを貼るだけ</li>
+                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-emerald-500" /> いつものPDFをアップするだけ</li>
                 <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-emerald-500" /> アプリ不要、URLを送るだけ</li>
               </ul>
             </motion.div>
           </div>
 
-          {/* Feature 2 */}
+          {/* Feature 2: ログ解析 (通知は削除) */}
           <div className="grid md:grid-cols-2 gap-16 items-center mb-32 border-b border-slate-100 pb-32">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-6"><Search size={24} /></div>
-              <h3 className="text-3xl font-bold mb-4 text-slate-900">顧客心理を「読み解く」</h3>
+              <h3 className="text-3xl font-bold mb-4 text-slate-900">顧客の「本音」が見える</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                「金額ページを3分も見ている」「事例を往復している」。<br/>
-                閲覧データを解析し、お客様の「本気度」をS・A・B・Cの4段階でランク付け。スマホに通知が届くので、営業の優先順位が一発でわかります。
+                「金額ページを3分も見ている」「事例を何度も見ている」。<br/>
+                管理画面を見れば、お客様の行動が丸わかり。興味があるのかないのか、手に取るように分かります。
               </p>
               <ul className="space-y-3 text-slate-700 font-medium">
-                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-blue-500" /> AIが激アツ客（Sランク）を自動判定</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-blue-500" /> 「今見ている」瞬間にLINEへ通知</li>
+                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-blue-500" /> 開封した日時を記録</li>
+                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-blue-500" /> どのページを長く見たか解析</li>
               </ul>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <div className="bg-slate-50 border border-slate-200 rounded-3xl aspect-[4/3] flex items-center justify-center shadow-lg relative overflow-hidden group p-4">
-                <Image src="/images/feature-2.png" alt="S/A/B/Cランク判定と通知画面" fill className="object-contain transition-transform duration-500 group-hover:scale-105" />
+                <Image src="/images/feature-2.png" alt="リアルタイム閲覧解析画面" fill className="object-contain transition-transform duration-500 group-hover:scale-105" />
               </div>
             </motion.div>
           </div>
 
-          {/* Feature 3 */}
+          {/* Feature 3: 自動追客 */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-2 md:order-1">
               <div className="bg-slate-50 border border-slate-200 rounded-3xl aspect-[4/3] flex items-center justify-center shadow-lg relative overflow-hidden group p-4">
@@ -332,13 +329,13 @@ export default function MitsumoriLP() {
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-6"><History size={24} /></div>
               <h3 className="text-3xl font-bold mb-4 text-slate-900">10年間の「自動フォロー」</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                見積もり直後の追客はもちろん、施工完了後もシステムが止まりません。<br/>
-                「1年点検」「台風後のお見舞い」「10年目の塗り替え提案」まで。<br/>
-                あなたが忘れていても、勝手にリピートと紹介を掘り起こします。
+                契約後もシステムは働き続けます。<br/>
+                「1年点検」「台風後のお見舞い」など、面倒なアフターフォロー連絡を自動化。<br/>
+                リピート案件を勝手に掘り起こします。
               </p>
               <ul className="space-y-3 text-slate-700 font-medium">
-                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-purple-500" /> 最適なタイミングでLINE送信</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-purple-500" /> 施工後10年間のアフターも完全自動化</li>
+                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-purple-500" /> LINE公式アカウントから自動送信</li>
+                <li className="flex items-center gap-3"><CheckCircle2 size={20} className="text-purple-500" /> 施工後10年間のスケジュールに対応</li>
               </ul>
             </motion.div>
           </div>
@@ -358,33 +355,14 @@ export default function MitsumoriLP() {
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-6">先行モニター募集</h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              「URLを送るだけ」で、AIが自動で追客します。<br />
-              リリース記念、先着30社様限定で<span className="text-emerald-400 font-bold">「半額」</span>モニターを募集します。
+              「URLを送るだけ」で、あとはシステムにお任せ。<br />
+              リリース記念、先着30社様限定で<span className="text-emerald-400 font-bold">「12ヶ月半額」</span>モニターを募集しています。
             </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 mb-8 max-w-lg mx-auto flex items-center gap-4 shadow-lg"
-          >
-            <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 shrink-0">
-              <ShieldCheck size={24} />
-            </div>
-            <div className="text-left">
-              <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-1">SYSTEM MERIT</p>
-              <p className="font-bold text-lg leading-snug">
-                追客の取りこぼし <span className="text-emerald-400 text-xl">0件</span> / 精神的負担 <span className="text-emerald-400 text-xl">ゼロ</span>
-                {/* 修正：ここで改行し、注釈をブロック要素にする */}
-                <span className="block text-xs font-normal text-slate-400 mt-1">※システムによる自動化</span>
-              </p>
-            </div>
-          </motion.div>
-
-          {/* 修正：バッジ見切れ防止のため、カード全体をwrapするdivを作成 */}
+          {/* ... (Pricing Card部分は変更なし) ... */}
+          
           <div className="relative max-w-lg mx-auto">
-            {/* 修正：バッジをカードの外に出す */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg ring-4 ring-white z-20">
               先着30社限定
             </div>
@@ -406,16 +384,16 @@ export default function MitsumoriLP() {
                   <span className="text-6xl font-extrabold text-emerald-500 tracking-tight">24,800</span>
                   <span className="text-lg font-normal text-slate-500 ml-2">/月</span>
                 </div>
-                <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ 今登録すれば、一生この価格です。</p>
+                <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ 登録から12ヶ月間、この価格です。</p>
               </div>
 
               <ul className="space-y-4 mb-10">
                 {[
-                  "スナイパービュー（閲覧解析）",
-                  "LINE・メール自動追客",
+                  "閲覧ログ解析機能",
+                  "LINE公式アカウント自動追客",
                   "Web見積書 発行し放題",
-                  "S・A・B・C 顧客ランクAI判定",
-                  "施工後10年間の自動アフターフォロー"
+                  "施工後10年間の自動アフターフォロー",
+                  "導入設定サポート付き"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
                     <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
@@ -425,7 +403,7 @@ export default function MitsumoriLP() {
               </ul>
 
               <p className="text-xs text-center text-slate-500 mb-4">
-                対象：外壁塗装・屋根工事の中小で、見積後の追客が弱い会社向け
+                対象：外壁塗装・屋根工事の中小で、事務・営業を楽にしたい方
               </p>
 
               <a 
