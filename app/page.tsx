@@ -13,8 +13,7 @@ import {
   HeartHandshake,
   Send,
   Eye,
-  Zap,
-  ShieldCheck
+  Zap
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 
@@ -97,12 +96,12 @@ export default function MitsumoriLP() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                 </span>
                 <span className="text-xs md:text-sm font-bold text-amber-800 tracking-wide">
-                  先着30社・12ヶ月半額モニター募集中
+                  先着30社・完全無料モニター募集中
                 </span>
               </div>
             </motion.div>
 
-            {/* ★ここを修正: 「完全放置」訴求へ */}
+            {/* 見出し */}
             <motion.h1 variants={fadeInUp} className="text-3xl md:text-5xl font-extrabold leading-tight mb-8 tracking-tight text-slate-900 drop-shadow-sm">
               見積もりは<span className="text-emerald-600">見える化</span>、<br className="hidden md:block" />
               施工後は追客を<span className="text-emerald-600">自動化</span>。
@@ -112,7 +111,7 @@ export default function MitsumoriLP() {
               見積もり後は、お客様の閲覧状況を可視化して<span className="font-bold text-slate-800">「本気度」</span>がわかるように。<br className="hidden md:block" />
               施工後は、点検連絡や保証前のお知らせを自動で送り、<span className="font-bold text-slate-800">リピートと紹介獲得</span>につなげます。
             </motion.p>
-            {/* ステップ図 (通知を削除し、ログ確認へ変更) */}
+            {/* ステップ図 */}
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-sm md:text-lg font-bold text-slate-700 mb-12 bg-white/80 backdrop-blur-md py-4 px-8 rounded-full border border-slate-200 inline-flex shadow-md">
               <div className="flex items-center gap-2">
                 <Send size={20} className="text-slate-400" />
@@ -298,7 +297,7 @@ export default function MitsumoriLP() {
             </motion.div>
           </div>
 
-          {/* Feature 2: ログ解析 (通知は削除) */}
+          {/* Feature 2: ログ解析 */}
           <div className="grid md:grid-cols-2 gap-16 items-center mb-32 border-b border-slate-100 pb-32">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-6"><Search size={24} /></div>
@@ -357,12 +356,11 @@ export default function MitsumoriLP() {
             <h2 className="text-3xl md:text-5xl font-bold mb-6">先行モニター募集</h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
               「URLを送るだけ」で、あとはシステムにお任せ。<br />
-              リリース記念、先着30社様限定で<span className="text-emerald-400 font-bold">「12ヶ月半額」</span>モニターを募集しています。
+              リリース記念、先着30社様限定で<span className="text-emerald-400 font-bold">「完全無料」</span>モニターを募集しています。
             </p>
           </motion.div>
 
-          {/* ... (Pricing Card部分は変更なし) ... */}
-          
+          {/* Pricing Card */}
           <div className="relative max-w-lg mx-auto">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg ring-4 ring-white z-20">
               先着30社限定
@@ -382,10 +380,12 @@ export default function MitsumoriLP() {
                 <p className="text-slate-400 mb-2 line-through">通常月額 ¥49,800</p>
                 <div className="flex items-baseline justify-center gap-2 text-slate-900">
                   <span className="text-2xl font-bold">¥</span>
-                  <span className="text-6xl font-extrabold text-emerald-500 tracking-tight">24,800</span>
+                  {/* 価格を0に変更 */}
+                  <span className="text-6xl font-extrabold text-emerald-500 tracking-tight">0</span>
                   <span className="text-lg font-normal text-slate-500 ml-2">/月</span>
                 </div>
-                <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ 登録から12ヶ月間、この価格です。</p>
+                {/* 注釈を変更 */}
+                <p className="text-emerald-600 text-sm font-bold mt-4 bg-emerald-50 inline-block px-3 py-1 rounded-full">※ モニター期間中は完全無料でご利用いただけます。</p>
               </div>
 
               <ul className="space-y-4 mb-10">
