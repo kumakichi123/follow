@@ -21,7 +21,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow text-center space-y-6">
-        <h1 className="text-2xl font-bold">見積追客くん ログイン</h1>
+        <h1 className="text-2xl font-bold">追客プロ ログイン</h1>
         
         <form action={loginWithGoogle}>
           <button className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">

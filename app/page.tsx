@@ -61,7 +61,7 @@ export default function MitsumoriLP() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <LineChart size={18} className="text-white" />
             </div>
-            見積追客くん
+            追客プロ
           </div>
           <a 
             href={FORM_URL}
@@ -69,7 +69,7 @@ export default function MitsumoriLP() {
             rel="noopener noreferrer"
             className="hidden md:flex bg-slate-900 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-800 transition shadow-lg shadow-slate-900/20 items-center gap-2"
           >
-            <span>モニターに応募する</span>
+            <span>無料モニターに応募する</span>
             <ArrowRight size={14} />
           </a>
         </div>
@@ -101,16 +101,18 @@ export default function MitsumoriLP() {
               </div>
             </motion.div>
 
-            {/* 見出し */}
-            <motion.h1 variants={fadeInUp} className="text-3xl md:text-5xl font-extrabold leading-tight mb-8 tracking-tight text-slate-900 drop-shadow-sm">
-              見積もりは<span className="text-emerald-600">見える化</span>、<br className="hidden md:block" />
-              施工後は追客を<span className="text-emerald-600">自動化</span>。
+            {/* 見出し (変更点) */}
+            <motion.h1 variants={fadeInUp} className="text-3xl md:text-5xl font-extrabold leading-tight mb-6 tracking-tight text-slate-900 drop-shadow-sm">
+              見積もり・施工後の追客を<span className="text-emerald-600">自動化</span>し、<br className="md:hidden" />
+              <span className="text-emerald-600">成約</span>を増やす。
             </motion.h1>
 
+            {/* サブテキスト (変更点) */}
             <motion.p variants={fadeInUp} className="text-base md:text-lg text-slate-600 mb-10 font-medium max-w-3xl mx-auto leading-relaxed">
-              見積もり後は、お客様の閲覧状況を可視化して<span className="font-bold text-slate-800">「本気度」</span>がわかるように。<br className="hidden md:block" />
-              施工後は、点検連絡や保証前のお知らせを自動で送り、<span className="font-bold text-slate-800">リピートと紹介獲得</span>につなげます。
+              見積後はお客様の閲覧状況を<span className="font-bold text-slate-800">可視化</span>し、それに応じて追客。<br className="hidden md:block" />
+              施工後は、点検連絡や保証前のお知らせを<span className="font-bold text-slate-800">自動</span>で送り、リピートと紹介獲得につなげます。
             </motion.p>
+            
             {/* ステップ図 */}
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-sm md:text-lg font-bold text-slate-700 mb-12 bg-white/80 backdrop-blur-md py-4 px-8 rounded-full border border-slate-200 inline-flex shadow-md">
               <div className="flex items-center gap-2">
@@ -133,7 +135,7 @@ export default function MitsumoriLP() {
               <span className="bg-slate-100 px-3 py-1 rounded text-slate-600">対象</span> <strong>外壁塗装・屋根工事</strong>で、営業が苦手・忙しくて手が回らない会社向け
             </motion.p>
 
-            {/* CTAボタン */}
+            {/* CTAボタン (変更点) */}
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
               <a 
                 href={FORM_URL}
@@ -142,7 +144,7 @@ export default function MitsumoriLP() {
                 className="group relative bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold px-10 py-4 rounded-full transition-all shadow-xl shadow-emerald-600/30 hover:shadow-emerald-600/40 transform hover:-translate-y-0.5 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  モニターに応募する
+                  無料モニターに応募する
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 </span>
                 <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] animate-[shimmer_3s_infinite]"></div>
@@ -170,7 +172,7 @@ export default function MitsumoriLP() {
               <div className="relative bg-white rounded-xl aspect-[16/9] flex items-center justify-center overflow-hidden">
                 <Image
                   src="/images/hero-image.jpg"
-                  alt="見積追客くん 管理画面UI"
+                  alt="追客プロ 管理画面UI"
                   fill
                   className="object-cover"
                   priority
@@ -407,13 +409,14 @@ export default function MitsumoriLP() {
                 対象：外壁塗装・屋根工事の中小で、事務・営業を楽にしたい方
               </p>
 
+              {/* ボタンテキストを変更 */}
               <a 
                 href={FORM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xl text-center py-5 rounded-xl transition shadow-xl relative overflow-hidden group"
               >
-                <span className="relative z-10">モニター枠を押さえる</span>
+                <span className="relative z-10">無料モニターに応募する</span>
                 <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-white/10 skew-x-[-20deg] group-hover:animate-[shimmer_1s_infinite]"></div>
               </a>
               <div className="text-center text-slate-500 text-xs mt-4 space-y-1">
@@ -432,9 +435,9 @@ export default function MitsumoriLP() {
           <div className="w-6 h-6 bg-slate-900 rounded flex items-center justify-center">
             <LineChart size={14} className="text-white" />
           </div>
-          見積追客くん
+          追客プロ
         </div>
-        <p>&copy; 2025 見積追客くん All rights reserved.</p>
+        <p>&copy; 2025 追客プロ All rights reserved.</p>
       </footer>
     </div>
   );

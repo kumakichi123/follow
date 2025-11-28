@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
@@ -9,8 +9,8 @@ const notoSansJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "見積追客くん",
-  description: "塗装・リフォーム特化型 成約支援SaaS",
+  title: "追客プロ",
+  description: "塗装・リフォーム特化の見積もり＆追客自動化SaaS",
 };
 
 export default function RootLayout({

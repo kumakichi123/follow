@@ -27,7 +27,7 @@ export default function SignupPage() {
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">アカウント作成</h2>
           <p className="mt-2 text-sm text-gray-600">
-            見積追客くんで、営業を自動化しましょう。
+            追客プロで、営業を自動化しましょう。
           </p>
         </div>
 
