@@ -13,7 +13,7 @@ export default async function SettingsPage() {
   // 1. LINE設定があるか確認
   const { data: lineSetting } = await supabase
     .from('line_settings')
-    .select('bot_user_id')
+    .select('bot_user_id, liff_url')
     .eq('user_id', user.id)
     .single()
 
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
         {/* LINE連携設定 */}
         <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h3 className="font-bold text-lg mb-4 text-gray-800">LINE連携設定</h3>
-          
+
           {isLinked ? (
             <div className="p-4 bg-green-50 rounded-lg border border-green-100 space-y-3">
               <div className="flex items-center gap-3">
@@ -60,6 +60,23 @@ export default async function SettingsPage() {
                   設定を編集する
                 </Link>
               </div>
+
+              {lineSetting?.liff_url ? (
+                <div className="bg-white rounded-xl border border-emerald-100 p-4 text-sm text-emerald-800">
+                  <p className="font-semibold">共有リンク例</p>
+                  <p className="break-all text-xs mt-1">
+                    {lineSetting.liff_url.replace(/\/$/, '')}
+                    /<span className="text-emerald-500 font-mono">[token]</span>
+                  </p>
+                  <p className="text-xs mt-2">
+                    見積を作成すると token が発行されます。上記リンクをコピーして顧客へ送ると、自動でLINEの顧客IDと見積が紐づきます。
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-green-800">
+                  LIFF共有URLが未登録です。設定ページで https://liff.line.me/ から始まるURLを追加すると、顧客ごとに自動追客リンクを作成できます。
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -67,11 +84,11 @@ export default async function SettingsPage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold">L</div>
                 <div>
                   <p className="font-bold text-gray-600">未連携</p>
-                  <p className="text-xs text-gray-500">自動追客機能を使うには連携が必要です。</p>
+                  <p className="text-xs text-gray-500">自動追客機能を使うにはLINE公式アカウントとの連携が必要です。</p>
                 </div>
               </div>
-              <Link 
-                href="/dashboard/settings/line" 
+              <Link
+                href="/dashboard/settings/line"
                 className="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
               >
                 連携設定へ

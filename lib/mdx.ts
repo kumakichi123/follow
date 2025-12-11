@@ -90,7 +90,7 @@ export async function getAllEntries(collection: Collection) {
   const files = await collectMdxFiles(dir)
 
   const entries = await Promise.all(
-    files.map(async (file) => {
+    files.map(async (file: string) => {
       const raw = await fs.readFile(file, 'utf-8')
       const { data, content } = matter(raw)
       const slug = data.slug ?? fileToSlug(file, dir)
@@ -126,7 +126,7 @@ export async function getCompiledEntry(collection: Collection, slug: string): Pr
   return { meta, content }
 }
 
-async function collectMdxFiles(dir: string) {
+async function collectMdxFiles(dir: string): Promise<string[]> {
   const dirents = await fs.readdir(dir, { withFileTypes: true })
   const files = await Promise.all(
     dirents.map((dirent) => {
@@ -155,17 +155,22 @@ async function resolveFilePath(dir: string, slug: string) {
 }
 
 function normalizeFrontmatter(collection: Collection, data: RawFrontmatter = {}, slug: string, body: string): ContentMeta {
-  if (!data.title || !data.description) {
+  const fallbackTitle = slug.split('/').pop()?.replace(/-/g, ' ') ?? 'Untitled'
+  const fallbackDescription = body.trim().slice(0, 120) || 'Content description'
+  const resolvedTitle = data.title?.trim() ?? fallbackTitle
+  const resolvedDescription = data.description?.trim() ?? fallbackDescription
+
+  if (!resolvedTitle || !resolvedDescription) {
     throw new Error(`Missing title or description in frontmatter for ${collection}/${slug}`)
   }
 
   const breadcrumbs = data.breadcrumbs?.length
     ? data.breadcrumbs
-    : [...defaultBreadcrumbs[collection], { label: data.title, href: `/${collection}/${slug}` }]
+    : [...defaultBreadcrumbs[collection], { label: resolvedTitle, href: `/${collection}/${slug}` }]
 
   return {
-    title: data.title,
-    description: data.description,
+    title: resolvedTitle,
+    description: resolvedDescription,
     slug,
     author: data.author ?? '追客プロ編集部',
     createdAt: data.createdAt ?? new Date().toISOString(),

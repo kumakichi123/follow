@@ -6,7 +6,6 @@ import { ArrowRight, CalendarDays, Check, CheckCircle2, Clock, Trash2 } from 'lu
 type PlanOption = {
   key: 'matsu' | 'take' | 'ume'
   title: string
-  subtitle: string
   amount: number
   description: string
   perks: string[]
@@ -152,10 +151,7 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">{plan.subtitle}</p>
-                    <p className="text-xl font-bold text-slate-900">{plan.title}</p>
-                  </div>
+                  <p className="text-xl font-bold text-slate-900">{plan.title}</p>
                   {plan.recommended && (
                     <span className="text-[10px] font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
                       おすすめ

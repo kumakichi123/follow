@@ -8,6 +8,12 @@ export default async function CreateEstimatePage() {
 
   if (!user) redirect('/login')
 
+  const { data: lineSetting } = await supabase
+    .from('line_settings')
+    .select('liff_url')
+    .eq('user_id', user.id)
+    .single()
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -18,7 +24,7 @@ export default async function CreateEstimatePage() {
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-        <UploadForm userId={user.id} />
+        <UploadForm userId={user.id} liffUrl={lineSetting?.liff_url ?? null} />
       </div>
     </div>
   )

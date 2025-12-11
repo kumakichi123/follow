@@ -6,10 +6,23 @@ import { redirect } from 'next/navigation'
 
 // ▼ LINE設定の保存（変更なしだが、念のため記載）
 export async function saveLineSettings(formData: FormData) {
-  const token = formData.get('token') as string
-  const secret = formData.get('secret') as string
+  const token = (formData.get('token') as string)?.trim()
+  const secret = (formData.get('secret') as string)?.trim()
+  const rawLiffUrl = (formData.get('liff_url') as string)?.trim()
 
-  if (!token || !secret) return { error: 'すべての項目を入力してください' }
+  if (!token || !secret || !rawLiffUrl) return { error: 'すべての項目を入力してください' }
+
+  let normalizedLiffUrl: string
+  try {
+    const parsed = new URL(rawLiffUrl.startsWith('http') ? rawLiffUrl : `https://${rawLiffUrl}`)
+    normalizedLiffUrl = `${parsed.origin}${parsed.pathname}`.replace(/\/$/, '')
+  } catch {
+    return { error: 'LIFF共有URLの形式が不正です' }
+  }
+
+  const liffMatch = normalizedLiffUrl.match(/liff\.line\.me\/([^/?#]+)/)
+  if (!liffMatch) return { error: 'https://liff.line.me/xxxxxxxx の形式で入力してください' }
+  const liffId = liffMatch[1]
 
   // 疎通確認
   const lineRes = await fetch('https://api.line.me/v2/bot/info', {
@@ -37,6 +50,8 @@ export async function saveLineSettings(formData: FormData) {
       channel_access_token: token,
       channel_secret: secret,
       bot_user_id: botUserId,
+      liff_url: normalizedLiffUrl,
+      liff_id: liffId,
     }, { onConflict: 'user_id' })
 
   if (dbError) return { error: 'LINE設定の保存に失敗しました' }

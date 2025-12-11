@@ -8,31 +8,33 @@ import { createClient } from '@/utils/supabase/client'
 type EstimateForEdit = {
   id: string
   customer_name: string
-  customer_phone: string | null
   matsu_amount: number | null
   take_amount: number | null
   ume_amount: number | null
+  matsu_label: string | null
+  matsu_description: string | null
+  take_label: string | null
+  take_description: string | null
+  ume_label: string | null
+  ume_description: string | null
 }
 
 const PLAN_LIBRARY = [
   {
     key: 'matsu' as const,
     label: '松プラン',
-    sub: 'プレミアム',
     accent: 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200',
     description: '最上位のサポートとリッチなオプションを含みます。',
   },
   {
     key: 'take' as const,
     label: '竹プラン',
-    sub: 'スタンダード',
     accent: 'bg-gradient-to-br from-emerald-50 to-white border-emerald-200',
     description: '迷ったらこれ。コストと成果のバランスが最適です。',
   },
   {
     key: 'ume' as const,
     label: '梅プラン',
-    sub: 'ライト',
     accent: 'bg-gradient-to-br from-slate-50 to-white border-slate-200',
     description: '必要最低限に絞った試しやすいプランです。',
   },
@@ -40,21 +42,50 @@ const PLAN_LIBRARY = [
 
 type PlanKey = typeof PLAN_LIBRARY[number]['key']
 
+type PlanDetails = Record<
+  PlanKey,
+  {
+    label: string
+    description: string
+  }
+>
+
 export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
   const router = useRouter()
   const supabase = createClient()
-  const presetPlans = PLAN_LIBRARY.map((plan) => plan.key).filter((key) => {
-    const value = estimate[${key}_amount as keyof EstimateForEdit]
-    return typeof value === 'number' && value !== null
-  }) as PlanKey[]
-  const [activePlans, setActivePlans] = useState<PlanKey[]>(
-    presetPlans.length ? presetPlans : [PLAN_LIBRARY[0].key],
+
+  const amountMap: Record<PlanKey, number | null> = {
+    matsu: estimate.matsu_amount,
+    take: estimate.take_amount,
+    ume: estimate.ume_amount,
+  }
+
+  const planInitialDetails: PlanDetails = {
+    matsu: {
+      label: estimate.matsu_label ?? PLAN_LIBRARY[0].label,
+      description: estimate.matsu_description ?? PLAN_LIBRARY[0].description,
+    },
+    take: {
+      label: estimate.take_label ?? PLAN_LIBRARY[1].label,
+      description: estimate.take_description ?? PLAN_LIBRARY[1].description,
+    },
+    ume: {
+      label: estimate.ume_label ?? PLAN_LIBRARY[2].label,
+      description: estimate.ume_description ?? PLAN_LIBRARY[2].description,
+    },
+  }
+
+  const presetPlans = (['matsu', 'take', 'ume'] as PlanKey[]).filter(
+    (key) => typeof amountMap[key] === 'number' && amountMap[key] !== null
   )
+  const [activePlans, setActivePlans] = useState<PlanKey[]>(presetPlans.length ? presetPlans : ['matsu'])
+  const [planDetails, setPlanDetails] = useState<PlanDetails>(planInitialDetails)
+  const [loading, setLoading] = useState(false)
+
   const nextPlanKey = useMemo(
     () => PLAN_LIBRARY.find((plan) => !activePlans.includes(plan.key))?.key ?? null,
-    [activePlans],
+    [activePlans]
   )
-  const [loading, setLoading] = useState(false)
 
   const handleAddPlan = () => {
     if (!nextPlanKey) return
@@ -66,16 +97,25 @@ export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
     setActivePlans((prev) => prev.filter((planKey) => planKey !== key))
   }
 
+  const handleDetailChange = (planKey: PlanKey, field: 'label' | 'description', value: string) => {
+    setPlanDetails((prev) => ({
+      ...prev,
+      [planKey]: {
+        ...prev[planKey],
+        [field]: value,
+      },
+    }))
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
     const formData = new FormData(event.currentTarget)
 
     const customerName = (formData.get('customer_name') as string)?.trim()
-    const customerPhone = (formData.get('customer_phone') as string)?.trim()
 
-    if (!customerName || !customerPhone) {
-      alert('顧客名と電話番号を入力してください')
+    if (!customerName) {
+      alert('顧客名を入力してください')
       setLoading(false)
       return
     }
@@ -87,13 +127,13 @@ export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
     }
 
     activePlans.forEach((planKey) => {
-      const input = (formData.get(price_) as string)?.trim()
+      const input = (formData.get(`price_${planKey}`) as string)?.trim()
       priceValues[planKey] = input ? Number(input) : null
     })
 
     const representative = priceValues[activePlans[0]]
     if (representative === null || Number.isNaN(representative)) {
-      alert('最低1つのプラン金額を入力してください')
+      alert('最初のプラン金額を入力してください')
       setLoading(false)
       return
     }
@@ -103,10 +143,15 @@ export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
         .from('estimates')
         .update({
           customer_name: customerName,
-          customer_phone: customerPhone.replace(/[^0-9+]/g, ''),
           matsu_amount: priceValues.matsu,
           take_amount: priceValues.take,
           ume_amount: priceValues.ume,
+          matsu_label: planDetails.matsu.label,
+          matsu_description: planDetails.matsu.description,
+          take_label: planDetails.take.label,
+          take_description: planDetails.take.description,
+          ume_label: planDetails.ume.label,
+          ume_description: planDetails.ume.description,
           amount: representative,
         })
         .eq('id', estimate.id)
@@ -136,15 +181,6 @@ export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
             className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
           />
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">顧客の電話番号</label>
-          <input
-            name="customer_phone"
-            defaultValue={estimate.customer_phone ?? ''}
-            required
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
-          />
-        </div>
       </div>
 
       <div className="flex items-center justify-between">
@@ -162,30 +198,39 @@ export function EditForm({ estimate }: { estimate: EstimateForEdit }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {activePlans.map((planKey) => {
           const plan = PLAN_LIBRARY.find((p) => p.key === planKey)!
-          const amount = estimate[${planKey}_amount as keyof EstimateForEdit]
+          const amount = amountMap[plan.key]
           return (
-            <div key={plan.key} className={ounded-2xl border p-5 }>
+            <div key={plan.key} className={`rounded-2xl border p-5 ${plan.accent}`}>
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-gray-500">{plan.sub}</p>
-                  <p className="text-lg font-bold text-gray-900">{plan.label}</p>
+                <div className="space-y-2">
+                  <input
+                    value={planDetails[plan.key].label}
+                    onChange={(event) => handleDetailChange(plan.key, 'label', event.target.value)}
+                    className="text-lg font-bold text-gray-900 bg-transparent border border-transparent focus:border-gray-300 rounded-lg px-2 py-1 focus:outline-none"
+                  />
                 </div>
                 {activePlans.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemovePlan(plan.key)}
                     className="text-slate-400 hover:text-red-500"
-                    aria-label={${plan.label}を削除}
+                    aria-label={`${plan.label}を削除`}
                   >
                     <Trash2 size={16} />
                   </button>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
+              <textarea
+                value={planDetails[plan.key].description}
+                onChange={(event) => handleDetailChange(plan.key, 'description', event.target.value)}
+                className="text-sm text-gray-600 mb-4 bg-transparent border border-dashed border-gray-200 rounded-xl w-full px-3 py-2 focus:border-gray-400 focus:outline-none resize-none"
+                rows={3}
+                placeholder="プランの説明を入力"
+              />
               <div className="relative">
                 <span className="absolute top-1/2 -translate-y-1/2 left-3 text-sm text-gray-500">¥</span>
                 <input
-                  name={price_}
+                  name={`price_${plan.key}`}
                   type="number"
                   min={0}
                   defaultValue={typeof amount === 'number' ? amount ?? undefined : undefined}

@@ -78,6 +78,24 @@ export default function LineConnectPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              LIFF共有URL
+            </label>
+            <input
+              name="liff_url"
+              type="url"
+              required
+              placeholder="https://liff.line.me/XXXX-YYYY"
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              LINE Developersで作成したLIFFアプリのURLを入力してください。Endpoint URLは
+              <code className="px-1 py-0.5 mx-1 bg-gray-100 rounded">https://paint-sales.vercel.app/liff-entry</code>
+              に設定し、配布時はこのURLの末尾に見積トークンが自動的に付与されます。
+            </p>
+          </div>
+
           <button 
             disabled={loading} 
             className="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-lg flex justify-center items-center gap-2 transition-colors disabled:opacity-50"

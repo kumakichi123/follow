@@ -1,12 +1,12 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { FileText, Phone, Edit } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { FileText, Edit } from 'lucide-react'
 
 type EstimateRow = {
   id: string
   token: string
   customer_name: string
-  customer_phone: string | null
   matsu_amount: number | null
   take_amount: number | null
   ume_amount: number | null
@@ -24,17 +24,17 @@ const formatCurrency = (value?: number | null) => {
   return `¥${value.toLocaleString('ja-JP')}`
 }
 
-const disabledActionClasses =
-  'pointer-events-none cursor-not-allowed opacity-50 border border-gray-200 text-gray-400'
-const actionButtonBase =
-  'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors duration-150'
-
 export default async function CustomersPage() {
   const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/login')
 
   const { data: estimates } = await supabase
     .from('estimates')
-    .select('id, token, customer_name, customer_phone, matsu_amount, take_amount, ume_amount, created_at')
+    .select('id, token, customer_name, matsu_amount, take_amount, ume_amount, created_at')
     .order('created_at', { ascending: false })
   const rows = (estimates ?? []) as EstimateRow[]
 
@@ -44,7 +44,7 @@ export default async function CustomersPage() {
         <div>
           <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">顧客ハブ</p>
           <h2 className="text-3xl font-bold text-gray-900">顧客・案件リスト</h2>
-          <p className="text-sm text-gray-500 mt-1">専用URLを共有し、気になる顧客はLINEや電話でフォローしましょう。</p>
+          <p className="text-sm text-gray-500 mt-1">専用URLを共有し、気になる顧客はLINEでフォローしましょう。</p>
         </div>
         <Link
           href="/dashboard/create"
@@ -67,25 +67,16 @@ export default async function CustomersPage() {
             {rows.map((est) => {
               const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
               const shareUrl = `${baseUrl}/e/${est.token}`
-              const phoneHref = est.customer_phone ? `tel:${est.customer_phone}` : undefined
               const createdAt = new Date(est.created_at).toLocaleDateString('ja-JP', {
                 month: 'short',
                 day: 'numeric',
               })
-              const callClasses = phoneHref
-                ? `${actionButtonBase} border border-gray-200 text-gray-700 hover:bg-gray-50`
-                : `${actionButtonBase} ${disabledActionClasses}`
-
               return (
                 <tr key={est.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4 align-top">
                     <p className="font-semibold text-gray-900">{est.customer_name} 様</p>
                     <p className="text-xs text-gray-400 mt-1">作成日: {createdAt}</p>
-                    {est.customer_phone ? (
-                      <p className="text-xs text-gray-500 mt-1">電話: {est.customer_phone}</p>
-                    ) : (
-                      <p className="text-xs text-red-500 mt-1">顧客の電話番号が未登録です</p>
-                    )}
+                    <p className="text-xs text-gray-500 mt-1">閲覧履歴はLINE連携から確認できます。</p>
                   </td>
                   <td className="p-4 align-top">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -115,10 +106,6 @@ export default async function CustomersPage() {
                         <Edit size={16} />
                         編集
                       </Link>
-                      <a href={phoneHref || undefined} className={callClasses} aria-disabled={!phoneHref}>
-                        <Phone size={16} />
-                        電話する
-                      </a>
                     </div>
                   </td>
                 </tr>
