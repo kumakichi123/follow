@@ -49,6 +49,12 @@ const floating: Variants = {
   }
 };
 
+const footerLinks = [
+  { href: "/legal/terms", label: "利用規約" },
+  { href: "/legal/privacy", label: "プライバシーポリシー" },
+  { href: "/legal/commercial", label: "特定商取引法に基づく表記" }
+] as const;
+
 
 export default function MitsumoriLP() {
   return (
@@ -96,7 +102,7 @@ export default function MitsumoriLP() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                 </span>
                 <span className="text-xs md:text-sm font-bold text-amber-800 tracking-wide">
-                  先着30社・完全無料モニター募集中
+                  完全無料モニター受付中
                 </span>
               </div>
             </motion.div>
@@ -113,27 +119,7 @@ export default function MitsumoriLP() {
               施工後は、点検連絡や保証前のお知らせを<span className="font-bold text-slate-800">自動</span>で送り、リピートと紹介獲得につなげます。
             </motion.p>
             
-            {/* ステップ図 */}
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-sm md:text-lg font-bold text-slate-700 mb-12 bg-white/80 backdrop-blur-md py-4 px-8 rounded-full border border-slate-200 inline-flex shadow-md">
-              <div className="flex items-center gap-2">
-                <Send size={20} className="text-slate-400" />
-                <span>URLを送る</span>
-              </div>
-              <ArrowRight size={20} className="text-slate-300" />
-              <div className="flex items-center gap-2">
-                <Eye size={20} className="text-blue-500" />
-                <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded">既読が分かる</span>
-              </div>
-              <ArrowRight size={20} className="text-slate-300" />
-              <div className="flex items-center gap-2">
-                <Zap size={20} className="text-emerald-500" />
-                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">勝手に追客</span>
-              </div>
-            </motion.div>
 
-            <motion.p variants={fadeInUp} className="text-sm md:text-base text-slate-500 mb-10 font-medium">
-              <span className="bg-slate-100 px-3 py-1 rounded text-slate-600">対象</span> <strong>外壁塗装・屋根工事</strong>で、営業が苦手・忙しくて手が回らない会社向け
-            </motion.p>
 
             {/* CTAボタン (変更点) */}
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
@@ -194,7 +180,7 @@ export default function MitsumoriLP() {
              className="text-center mb-20"
            >
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
-              契約前から10年後まで、<br className="md:hidden"/>システムが「顧客」を離さない。
+              見積もり後の追客から施工後のアフターフォローまで、<br className="md:hidden"/>システムが「顧客」を離さない。
             </h2>
             <p className="text-slate-600 text-lg">
               あなたは「現場」に集中してください。面倒な事務連絡はすべて自動化します。
@@ -357,15 +343,15 @@ export default function MitsumoriLP() {
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-6">先行モニター募集</h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              「URLを送るだけ」で、あとはシステムにお任せ。<br />
-              リリース記念、先着30社様限定で<span className="text-emerald-400 font-bold">「完全無料」</span>モニターを募集しています。
+              「見積もり情報を入力するだけ」で、あとはシステムにお任せ。<br />
+              リリース準備の検証期間として<span className="text-emerald-400 font-bold">「完全無料」</span>モニターを募集しています。
             </p>
           </motion.div>
 
           {/* Pricing Card */}
           <div className="relative max-w-lg mx-auto">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg ring-4 ring-white z-20">
-              先着30社限定
+              期間限定
             </div>
 
             <motion.div 
@@ -405,9 +391,7 @@ export default function MitsumoriLP() {
                 ))}
               </ul>
 
-              <p className="text-xs text-center text-slate-500 mb-4">
-                対象：外壁塗装・屋根工事の中小で、事務・営業を楽にしたい方
-              </p>
+
 
               {/* ボタンテキストを変更 */}
               <a 
@@ -420,9 +404,9 @@ export default function MitsumoriLP() {
                 <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-white/10 skew-x-[-20deg] group-hover:animate-[shimmer_1s_infinite]"></div>
               </a>
               <div className="text-center text-slate-500 text-xs mt-4 space-y-1">
-                <p>※ 1月上旬のリリース時にご案内をお送りします。</p>
-                <p>※ 費用は導入するまで発生しません。</p>
-                <p>※ LINE自動送信には別途LINE公式アカウント（無料プラン〜）が必要です。</p>
+                <p>※ ご利用開始時期は別途メールでご案内します。</p>
+                <p>※ 費用は正式リリース後3か月間発生しません。</p>
+                <p>※ サービス改善のため、ご感想やご要望のヒアリングにご協力をお願いします。</p>
               </div>
             </motion.div>
           </div>
@@ -430,14 +414,27 @@ export default function MitsumoriLP() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-slate-100 text-center text-slate-500 text-sm bg-white">
-        <div className="flex items-center justify-center gap-2 mb-4 font-bold text-lg text-slate-800">
-          <div className="w-6 h-6 bg-slate-900 rounded flex items-center justify-center">
-            <LineChart size={14} className="text-white" />
+      <footer className="py-12 border-t border-slate-100 bg-slate-50 text-slate-600">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3 font-bold text-2xl text-slate-900">
+            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-md shadow-slate-900/20">
+              <LineChart size={18} className="text-white" />
+            </div>
+            追客プロ
           </div>
-          追客プロ
+          <div className="flex flex-wrap gap-4 text-sm font-semibold">
+            {footerLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-emerald-600 hover:text-emerald-500 underline underline-offset-4"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500">&copy; 2025 追客プロ</p>
         </div>
-        <p>&copy; 2025 追客プロ All rights reserved.</p>
       </footer>
     </div>
   );

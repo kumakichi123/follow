@@ -1,0 +1,55 @@
+﻿---
+title: "追客プロの初期セットアップ"
+description: "アカウント作成から見積もりテンプレ同期までを15分で終わらせる手順です。"
+slug: "getting-started/first-setup"
+author: "追客プロオンボーディングチーム"
+createdAt: "2025-12-01"
+updatedAt: "2025-12-01"
+tags:
+  - "セットアップ"
+  - "オンボーディング"
+heroImage: "/images/docs/setup-wizard.png"
+breadcrumbs:
+  - label: "Docs"
+    href: "/docs"
+  - label: "Getting Started"
+    href: "/docs/getting-started"
+schema:
+  type: "HowTo"
+  howTo:
+    totalTime: "PT15M"
+    supplies:
+      - "追客プロの管理アカウント"
+      - "顧客マスタCSV"
+    steps:
+      - title: "アカウントを有効化"
+        text: "招待メールのリンクを開き、2FAを設定します。"
+      - title: "顧客テンプレを読み込む"
+        text: "設定 > データ管理からCSVをインポートし、必須カラムをマッピングします。"
+      - title: "見積もりテンプレを同期"
+        text: "松竹梅テンプレをONにし、既存の単価表をアップロードします。"
+  faqs:
+    - question: "CSVはどんな形式？"
+      answer: "UTF-8 / ヘッダー付き / customer_name phone project_type の3列が必須です。"
+---
+
+
+# 追客プロの初期セットアップ
+
+15分で追客プロを稼働させるためのチェックリストです。この手順を完了すれば、すぐにWeb見積もりを発行できます。
+
+<StepCard title="Step 1" summary="アカウントを有効化">
+招待メールのリンクを開き、二段階認証を設定します（認証アプリ推奨）。権限ロールは「Owner」であることを確認してください。
+</StepCard>
+
+<StepCard title="Step 2" summary="顧客テンプレを読み込む">
+settings/data-import にあるCSVアップローダーで顧客マスタをインポートします。最初の100件で検証→全件アップロードの流れがおすすめです。
+</StepCard>
+
+<StepCard title="Step 3" summary="松竹梅テンプレを同期">
+テンプレート管理から「松・竹・梅」を有効化し、単価表をアップロードします。ここで登録した金額がWeb見積もりに反映されます。
+</StepCard>
+
+---
+
+これで初期設定は完了です。トライアル期間中はサポートチャットで画面共有も可能なので、不明点があれば遠慮なく連絡してください。

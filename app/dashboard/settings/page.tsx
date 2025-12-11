@@ -40,17 +40,25 @@ export default async function SettingsPage() {
           <h3 className="font-bold text-lg mb-4 text-gray-800">LINE連携設定</h3>
           
           {isLinked ? (
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100">
+            <div className="p-4 bg-green-50 rounded-lg border border-green-100 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#06C755] rounded-full flex items-center justify-center text-white font-bold">L</div>
                 <div>
                   <p className="font-bold text-green-900">公式アカウント連携済み</p>
-                  <p className="text-xs text-green-700">自動追客が有効になっています</p>
+                  <p className="text-xs text-green-700">自動追客が有効になっています。</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs bg-white text-green-700 px-2 py-1 rounded border border-green-200 font-bold">
-                <CheckCircle2 size={12} />
-                Active
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1 text-xs bg-white text-green-700 px-2 py-1 rounded border border-green-200 font-bold">
+                  <CheckCircle2 size={12} />
+                  Active
+                </div>
+                <Link
+                  href="/dashboard/settings/line"
+                  className="text-xs font-bold text-green-700 bg-white px-3 py-2 rounded-lg border border-green-200 hover:bg-green-100"
+                >
+                  設定を編集する
+                </Link>
               </div>
             </div>
           ) : (

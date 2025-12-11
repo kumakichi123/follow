@@ -1,18 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
-import { Loader2, Sparkles, Copy, Check, MessageSquare } from 'lucide-react'
+import { Loader2, Sparkles, Copy, Check, Plus, Trash2 } from 'lucide-react'
 
 type ShareInfo = {
   url: string
-  sms: string
   customer: string
 }
 
-const PLAN_FIELDS = [
+const PLAN_LIBRARY = [
   {
     key: 'matsu',
     label: '松プラン',
@@ -25,28 +24,33 @@ const PLAN_FIELDS = [
     label: '竹プラン',
     sub: 'スタンダード',
     accent: 'bg-gradient-to-br from-emerald-50 to-white border-emerald-200',
-    description: '迷ったらコレ。コストと成果のバランスが最適です。'
+    description: '迷ったらこれ。コストと成果のバランスが最適です。'
   },
   {
     key: 'ume',
     label: '梅プラン',
     sub: 'ライト',
     accent: 'bg-gradient-to-br from-slate-50 to-white border-slate-200',
-    description: '必要最低限の内容だけを抑えた手軽なプランです。'
+    description: '必要最低限に絞った試しやすいプランです。'
   }
 ] as const
 
-const buildSmsTemplate = (customer: string, url: string) =>
-  `お世話になっております。${customer}様向けに松・竹・梅の３プランをご用意しました。こちらから比較・お申し込みが可能です：${url}（LINE・電話でのご相談も歓迎です）`
+type PlanKey = typeof PLAN_LIBRARY[number]['key']
 
 export default function UploadForm({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false)
   const [shareInfo, setShareInfo] = useState<ShareInfo | null>(null)
-  const [copiedField, setCopiedField] = useState<'url' | 'sms' | null>(null)
+  const [copiedField, setCopiedField] = useState<'url' | null>(null)
+  const [activePlans, setActivePlans] = useState<PlanKey[]>([PLAN_LIBRARY[0].key])
   const supabase = createClient()
   const router = useRouter()
 
-  const handleCopy = async (text: string, target: 'url' | 'sms') => {
+  const nextPlanKey = useMemo(
+    () => PLAN_LIBRARY.find((plan) => !activePlans.includes(plan.key))?.key ?? null,
+    [activePlans]
+  )
+
+  const handleCopy = async (text: string, target: 'url') => {
     try {
       await navigator.clipboard.writeText(text)
       setCopiedField(target)
@@ -55,6 +59,16 @@ export default function UploadForm({ userId }: { userId: string }) {
       console.error('Copy failed', err)
       alert('クリップボードへコピーできませんでした')
     }
+  }
+
+  const handleAddPlan = () => {
+    if (!nextPlanKey) return
+    setActivePlans((prev) => [...prev, nextPlanKey])
+  }
+
+  const handleRemovePlan = (key: PlanKey) => {
+    if (activePlans.length === 1) return
+    setActivePlans((prev) => prev.filter((planKey) => planKey !== key))
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -66,12 +80,24 @@ export default function UploadForm({ userId }: { userId: string }) {
     const formData = new FormData(event.currentTarget)
     const customerName = (formData.get('customer_name') as string)?.trim()
     const customerPhone = (formData.get('customer_phone') as string)?.trim()
-    const matsu = Number(formData.get('price_matsu'))
-    const take = Number(formData.get('price_take'))
-    const ume = Number(formData.get('price_ume'))
 
-    if (!customerName || !customerPhone || Number.isNaN(matsu) || Number.isNaN(take) || Number.isNaN(ume)) {
-      alert('顧客名・電話番号・各プラン金額をすべて入力してください')
+    const priceValues: Record<PlanKey, number | null> = {
+      matsu: null,
+      take: null,
+      ume: null
+    }
+
+    activePlans.forEach((planKey) => {
+      const raw = (formData.get(`price_${planKey}`) as string)?.trim()
+      if (raw) {
+        priceValues[planKey] = Number(raw)
+      }
+    })
+
+    const firstActivePrice = priceValues[activePlans[0]]
+
+    if (!customerName || !customerPhone || firstActivePrice === null || Number.isNaN(firstActivePrice)) {
+      alert('顧客名・電話番号・金額を入力してください')
       setLoading(false)
       return
     }
@@ -86,10 +112,10 @@ export default function UploadForm({ userId }: { userId: string }) {
           user_id: userId,
           customer_name: customerName,
           customer_phone: cleanedPhone,
-          matsu_amount: matsu,
-          take_amount: take,
-          ume_amount: ume,
-          amount: take, // 既存ダッシュボード互換用の代表金額
+          matsu_amount: priceValues.matsu,
+          take_amount: priceValues.take,
+          ume_amount: priceValues.ume,
+          amount: firstActivePrice,
           token
         })
         .select('id, token')
@@ -106,7 +132,6 @@ export default function UploadForm({ userId }: { userId: string }) {
       event.currentTarget.reset()
       setShareInfo({
         url,
-        sms: buildSmsTemplate(customerName, url),
         customer: customerName
       })
     } catch (error) {
@@ -121,16 +146,11 @@ export default function UploadForm({ userId }: { userId: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-10">
       <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
-        <div className="flex items-start gap-3 mb-6">
+        <div className="flex items-start gap-3 mb-4">
           <div className="bg-green-100 text-green-700 rounded-full p-2">
             <Sparkles size={20} />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-green-700">顧客情報</p>
-            <p className="text-sm text-gray-600 mt-1">
-              SMSで送信できるよう、顧客名と電話番号（ハイフンなし推奨）を入力してください。
-            </p>
-          </div>
+          <p className="text-sm text-gray-600">顧客名と電話番号を入れて、必要なプランだけ作成します。</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -162,40 +182,56 @@ export default function UploadForm({ userId }: { userId: string }) {
         </div>
       </div>
 
-      <div>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <div>
-            <p className="text-sm font-semibold text-gray-900">松・竹・梅の料金</p>
-            <p className="text-sm text-gray-500">1つのフォームで3プラン同時発行。中間の竹プランはダッシュボード上での「代表金額」になります。</p>
-          </div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-900">プラン金額</p>
+          <button
+            type="button"
+            onClick={handleAddPlan}
+            disabled={!nextPlanKey}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 disabled:text-slate-300"
+          >
+            <Plus size={16} />
+            プランを追加
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLAN_FIELDS.map((plan) => (
-            <div key={plan.key} className={`rounded-2xl border p-5 ${plan.accent}`}>
-              <div className="flex items-baseline justify-between mb-4">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-gray-500">{plan.sub}</p>
-                  <p className="text-lg font-bold text-gray-900">{plan.label}</p>
+          {activePlans.map((planKey) => {
+            const plan = PLAN_LIBRARY.find((p) => p.key === planKey)!
+            return (
+              <div key={plan.key} className={`rounded-2xl border p-5 ${plan.accent}`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">{plan.sub}</p>
+                    <p className="text-lg font-bold text-gray-900">{plan.label}</p>
+                  </div>
+                  {activePlans.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePlan(plan.key)}
+                      className="text-slate-400 hover:text-red-500"
+                      aria-label={`${plan.label}を削除`}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
-                <span className="text-[11px] font-semibold text-gray-500 bg-white/70 px-2 py-0.5 rounded-full border border-white shadow-sm">
-                  税込
-                </span>
+                <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
+                <div className="relative">
+                  <span className="absolute top-1/2 -translate-y-1/2 left-3 text-sm text-gray-500">¥</span>
+                  <input
+                    name={`price_${plan.key}`}
+                    type="number"
+                    min={0}
+                    required={plan.key === activePlans[0]}
+                    placeholder="1000000"
+                    className="w-full border border-gray-300 rounded-xl pl-8 pr-4 py-3 text-lg font-semibold text-gray-900 focus:ring-2 focus:ring-green-500 outline-none placeholder-gray-400"
+                  />
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
-              <div className="relative">
-                <span className="absolute top-1/2 -translate-y-1/2 left-3 text-sm text-gray-500">¥</span>
-                <input
-                  name={`price_${plan.key}`}
-                  type="number"
-                  min={0}
-                  required
-                  placeholder="1000000"
-                  className="w-full border border-gray-300 rounded-xl pl-8 pr-4 py-3 text-lg font-semibold text-gray-900 focus:ring-2 focus:ring-green-500 outline-none placeholder-gray-400"
-                />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -234,24 +270,9 @@ export default function UploadForm({ userId }: { userId: string }) {
             </div>
           </div>
 
-          <div>
-            <p className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-              <MessageSquare size={16} /> SMS送信用テンプレ
-            </p>
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 leading-relaxed">
-              {shareInfo.sms}
-            </div>
-            <div className="flex justify-end mt-3">
-              <button
-                type="button"
-                onClick={() => handleCopy(shareInfo.sms, 'sms')}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-100"
-              >
-                {copiedField === 'sms' ? <Check size={14} /> : <Copy size={14} />}
-                {copiedField === 'sms' ? 'コピー済み' : 'SMS文面をコピー'}
-              </button>
-            </div>
-          </div>
+          <p className="text-xs text-gray-500">
+            LINE公式アカウントと連携済みの場合、閲覧ログに応じた自動フォローが走ります。必要に応じて上記URLを直接共有してください。
+          </p>
         </div>
       )}
     </form>
