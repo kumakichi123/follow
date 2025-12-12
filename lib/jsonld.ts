@@ -6,7 +6,7 @@ export function buildJsonLd(meta: ContentMeta) {
   const pagePath = meta.collection === 'blog' ? `/blog/${meta.slug}` : `/docs/${meta.slug}`
   const pageUrl = `${DEFAULT_BASE_URL.replace(/\/$/, '')}${pagePath}`
 
-  const payloads: Record<string, any>[] = []
+  const payloads: Array<Record<string, unknown>> = []
 
   const articlePayload = {
     '@context': 'https://schema.org',

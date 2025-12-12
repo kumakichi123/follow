@@ -12,14 +12,14 @@ const SIGN_OUT_LABEL = '\u30ed\u30b0\u30a2\u30a6\u30c8'
 
 const MENU_ITEMS = [
   {
-    name: '\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: '\u9867\u5ba2\u30ea\u30b9\u30c8',
+    name: '\u9867\u5ba2\u60c5\u5831',
     href: '/dashboard/customers',
     icon: Users,
+  },
+  {
+    name: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u76e3\u8996',
+    href: '/dashboard',
+    icon: LayoutDashboard,
   },
   {
     name: '\u898b\u7a4d\u4f5c\u6210',
@@ -40,6 +40,7 @@ export default function Sidebar() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPendingPath(null)
     if (timerRef.current) {
       clearTimeout(timerRef.current)

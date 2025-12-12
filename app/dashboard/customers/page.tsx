@@ -11,6 +11,9 @@ type EstimateRow = {
   take_amount: number | null
   ume_amount: number | null
   created_at: string
+  contract_status: string | null
+  contract_plan: 'matsu' | 'take' | 'ume' | null
+  contract_slots: string[] | null
 }
 
 const planLabelMap: Record<'matsu_amount' | 'take_amount' | 'ume_amount', string> = {
@@ -19,9 +22,31 @@ const planLabelMap: Record<'matsu_amount' | 'take_amount' | 'ume_amount', string
   ume_amount: '梅',
 }
 
+const contractPlanLabel: Record<'matsu' | 'take' | 'ume', string> = {
+  matsu: '松プラン',
+  take: '竹プラン',
+  ume: '梅プラン',
+}
+
 const formatCurrency = (value?: number | null) => {
   if (value === null || value === undefined) return '—'
   return `¥${value.toLocaleString('ja-JP')}`
+}
+
+const getStatusMeta = (status?: string | null) => {
+  switch (status) {
+    case 'tentative':
+      return { label: '仮契約', className: 'bg-amber-50 text-amber-700 border border-amber-100' }
+    case 'closed':
+      return { label: '成約', className: 'bg-emerald-50 text-emerald-700 border border-emerald-100' }
+    default:
+      return { label: '未契約', className: 'bg-gray-100 text-gray-600 border border-gray-200' }
+  }
+}
+
+const formatSlots = (slots?: string[] | null) => {
+  if (!slots || slots.length === 0) return '希望日時未選択'
+  return slots.join(' / ')
 }
 
 export default async function CustomersPage() {
@@ -34,7 +59,9 @@ export default async function CustomersPage() {
 
   const { data: estimates } = await supabase
     .from('estimates')
-    .select('id, token, customer_name, matsu_amount, take_amount, ume_amount, created_at')
+    .select(
+      'id, token, customer_name, matsu_amount, take_amount, ume_amount, created_at, contract_status, contract_plan, contract_slots'
+    )
     .order('created_at', { ascending: false })
   const rows = (estimates ?? []) as EstimateRow[]
 
@@ -60,7 +87,8 @@ export default async function CustomersPage() {
             <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wide">
               <th className="p-4 font-semibold">顧客 / 連絡先</th>
               <th className="p-4 font-semibold">松竹梅プラン</th>
-              <th className="p-4 font-semibold text-right">送付 / 閲覧</th>
+              <th className="p-4 font-semibold">契約ステータス</th>
+              <th className="p-4 font-semibold text-right">プレビュー / 編集</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -71,6 +99,9 @@ export default async function CustomersPage() {
                 month: 'short',
                 day: 'numeric',
               })
+              const statusMeta = getStatusMeta(est.contract_status)
+              const planLabel = est.contract_plan ? contractPlanLabel[est.contract_plan] : '未選択'
+
               return (
                 <tr key={est.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4 align-top">
@@ -87,6 +118,13 @@ export default async function CustomersPage() {
                         </div>
                       ))}
                     </div>
+                  </td>
+                  <td className="p-4 align-top">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusMeta.className}`}>
+                      {statusMeta.label}
+                    </span>
+                    <p className="text-sm text-gray-800 mt-3">プラン: {planLabel}</p>
+                    <p className="text-xs text-gray-500 mt-1">{formatSlots(est.contract_slots)}</p>
                   </td>
                   <td className="p-4 align-top text-right">
                     <div className="flex flex-col items-end gap-2">
@@ -114,8 +152,8 @@ export default async function CustomersPage() {
 
             {rows.length === 0 && (
               <tr>
-                <td colSpan={3} className="p-8 text-center text-gray-500">
-                  まだ見積もりはありません。右上のボタンから発行できます。
+                <td colSpan={4} className="p-8 text-center text-gray-500">
+                  まだ見積もりがありません。右上のボタンから発行できます。
                 </td>
               </tr>
             )}

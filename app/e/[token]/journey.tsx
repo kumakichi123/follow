@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, CalendarDays, Check, CheckCircle2, Clock, Trash2 } from 'lucide-react'
+import { CalendarDays, Check, CheckCircle2, Clock, Trash2 } from 'lucide-react'
 
 type PlanOption = {
   key: 'matsu' | 'take' | 'ume'
@@ -14,6 +14,7 @@ type PlanOption = {
 
 type JourneyProps = {
   estimateId: string
+  token: string
   planOptions: PlanOption[]
 }
 
@@ -28,10 +29,10 @@ type ScheduleChoice = {
 const MAX_CHOICES = 3
 
 const TIME_SLOTS = [
-  { value: 'morning', label: '10:00 〜 12:00 (午前)' },
-  { value: 'early_afternoon', label: '13:00 〜 15:00 (午後イチ)' },
-  { value: 'late_afternoon', label: '15:00 〜 17:00 (夕方前)' },
-  { value: 'evening', label: '17:00 〜 19:00 (夜)' }
+  { value: 'morning', label: '10:00 - 12:00（午前）' },
+  { value: 'early_afternoon', label: '13:00 - 15:00（午後早め）' },
+  { value: 'late_afternoon', label: '15:00 - 17:00（夕方前）' },
+  { value: 'evening', label: '17:00 - 19:00（夕方遅め）' },
 ] as const
 
 const slotLabelMap = TIME_SLOTS.reduce<Record<string, string>>((acc, slot) => {
@@ -60,14 +61,14 @@ const trackEvent = async (estimateId: string, eventType: string) => {
     await fetch('/api/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ estimateId, eventType })
+      body: JSON.stringify({ estimateId, eventType }),
     })
   } catch (err) {
     console.error('Tracking failed', err)
   }
 }
 
-export default function Journey({ estimateId, planOptions }: JourneyProps) {
+export default function Journey({ estimateId, token, planOptions }: JourneyProps) {
   const dateOptions = useMemo(() => generateDateOptions(), [])
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [focusedDate, setFocusedDate] = useState(dateOptions[0]?.iso ?? '')
@@ -98,8 +99,8 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
         dateISO: focusedDate,
         dateLabel: selectedDateLabel,
         slot: slotValue,
-        slotLabel: slotLabelMap[slotValue]
-      }
+        slotLabel: slotLabelMap[slotValue],
+      },
     ])
   }
 
@@ -108,30 +109,51 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
   }
 
   const handleScheduleSubmit = async () => {
-    if (!choices.length) return
+    if (!choices.length || !selectedPlan) return
     setSubmitting(true)
-    await trackEvent(estimateId, 'schedule_submit')
-    setTimeout(() => {
+    try {
+      await trackEvent(estimateId, 'schedule_submit')
+      const slotStrings = choices.map((choice) => `${choice.dateLabel} / ${choice.slotLabel}`)
+      const response = await fetch('/api/contracts/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          estimateId,
+          token,
+          planKey: selectedPlan,
+          slots: slotStrings,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit contract request')
+      }
+
+      alert('ご希望内容を送信しました。担当者から折り返します。')
+    } catch (err) {
+      console.error('契約情報の送信に失敗しました', err)
+      alert('送信に失敗しました。時間をおいて再度お試しください。')
+    } finally {
       setSubmitting(false)
-      alert('ご希望日時を担当者へ送信しました。折り返しのご連絡をお待ちください。')
-    }, 400)
+    }
   }
 
   const remainingSlots = MAX_CHOICES - choices.length
+  const isSubmitDisabled = !choices.length || !selectedPlan || submitting
 
   return (
     <div className="space-y-8">
       <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Plan Comparison</p>
-            <h3 className="text-2xl font-bold text-slate-900">松・竹・梅プラン</h3>
-            <p className="text-sm text-slate-500 mt-1">気になるプランをタップすると、契約ステップがアンロックされます。</p>
+            <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">プラン比較</p>
+            <h3 className="text-2xl font-bold text-slate-900">プランを選択してください</h3>
+            <p className="text-sm text-slate-500 mt-1">希望プランを決めると、次のステップが表示されます。</p>
           </div>
           {selectedPlan && (
             <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-2 rounded-xl text-sm font-semibold">
               <CheckCircle2 size={16} />
-              {planOptions.find((p) => p.key === selectedPlan)?.title}を選択中
+              {planOptions.find((p) => p.key === selectedPlan)?.title} を選択中
             </div>
           )}
         </div>
@@ -175,53 +197,12 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
       </section>
 
       <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-        <div>
-          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Workflow</p>
-          <h3 className="text-2xl font-bold text-slate-900">契約〜日程調整の流れ</h3>
-          <p className="text-sm text-slate-500 mt-1">プラン選択→契約内容の確認→電子サイン→日程調整の順で進みます。</p>
-        </div>
-
-        <ol className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[
-            { title: 'プラン決定', description: 'ご希望の松・竹・梅プランを選択してください。' },
-            { title: '契約内容確認', description: '契約条項をオンラインでご案内します。' },
-            { title: '電子サイン', description: 'スマホで完結する電子サインにご案内します。' },
-            { title: '日程調整', description: '第三希望まで候補日時をお知らせください。' }
-          ].map((step, index) => (
-            <li
-              key={step.title}
-              className={`rounded-2xl border px-4 py-5 ${
-                index === 0 && !selectedPlan ? 'border-dashed border-slate-200 text-slate-400' : 'border-slate-200'
-              }`}
-            >
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">STEP {index + 1}</p>
-              <p className="text-lg font-bold text-slate-900 mt-1">{step.title}</p>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">{step.description}</p>
-            </li>
-          ))}
-        </ol>
-
-        <button
-          type="button"
-          disabled={!selectedPlan}
-          className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold text-base ${
-            selectedPlan
-              ? 'bg-slate-900 text-white hover:bg-slate-800'
-              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-          }`}
-        >
-          契約手続きへ進む
-          <ArrowRight size={18} />
-        </button>
-      </section>
-
-      <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Scheduling</p>
+            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">日程調整</p>
             <h3 className="text-2xl font-bold text-slate-900">第三希望まで日程調整</h3>
             <p className="text-sm text-slate-500 mt-1">
-              本日から2週間後以降の日程のみ選択できます。カレンダーから日付を選び、希望時間帯を3つまで追加してください。
+              本日から2週間後以降の日程から選択できます。カレンダーから日付を選び、希望時間帯を三枠まで追加してください。
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-2 rounded-full">
@@ -256,7 +237,7 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
             <div>
               <p className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                 <Clock size={16} />
-                {selectedDateLabel || '日付を選択'}
+                {selectedDateLabel || '日付を選択してください'}
               </p>
               <p className="text-xs text-slate-500">時間帯をタップすると希望リストに追加されます。</p>
             </div>
@@ -301,11 +282,7 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
                       {choice.dateLabel} / {choice.slotLabel}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveChoice(choice.key)}
-                    className="text-slate-400 hover:text-red-500"
-                  >
+                  <button type="button" onClick={() => handleRemoveChoice(choice.key)} className="text-slate-400 hover:text-red-500">
                     <Trash2 size={16} />
                   </button>
                 </li>
@@ -315,12 +292,10 @@ export default function Journey({ estimateId, planOptions }: JourneyProps) {
 
           <button
             type="button"
-            disabled={!choices.length || submitting}
+            disabled={isSubmitDisabled}
             onClick={handleScheduleSubmit}
             className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold ${
-              choices.length
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              isSubmitDisabled ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
             <CalendarDays size={18} />

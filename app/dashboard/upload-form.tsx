@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
@@ -48,6 +48,11 @@ type PlanDetails = Record<
   }
 >
 
+type GalleryFile = {
+  file: File
+  preview: string
+}
+
 export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
   const [loading, setLoading] = useState(false)
   const [shareInfo, setShareInfo] = useState<ShareInfo | null>(null)
@@ -64,6 +69,8 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
   )
   const supabase = createClient()
   const router = useRouter()
+  const [galleryDescription, setGalleryDescription] = useState('')
+  const [galleryFiles, setGalleryFiles] = useState<GalleryFile[]>([])
 
   const nextPlanKey = useMemo(
     () => PLAN_LIBRARY.find((plan) => !activePlans.includes(plan.key))?.key ?? null,
@@ -71,6 +78,12 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
   )
 
   const sanitizedLiffBase = liffUrl ? liffUrl.replace(/\/$/, '') : null
+
+  useEffect(() => {
+    return () => {
+      galleryFiles.forEach((item) => URL.revokeObjectURL(item.preview))
+    }
+  }, [galleryFiles])
 
   const handleCopy = async (text: string, target: 'url' | 'liff') => {
     try {
@@ -101,6 +114,19 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
         [field]: value,
       },
     }))
+  }
+
+  const handleFilesSelected = (files: File[]) => {
+    if (!files.length) return
+    setGalleryFiles((prev) => {
+      const next = [...prev]
+      files.forEach((file) => {
+        if (next.length < 5) {
+          next.push({ file, preview: URL.createObjectURL(file) })
+        }
+      })
+      return next
+    })
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -136,6 +162,18 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
     const token = nanoid(10)
 
     try {
+      const galleryUploads: string[] = []
+      for (const [index, item] of galleryFiles.entries()) {
+        const ext = item.file.name.split('.').pop() ?? 'jpg'
+        const storagePath = `${userId}/${token}-${index}.${ext}`
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('estimate-gallery')
+          .upload(storagePath, item.file, { upsert: true })
+        if (uploadError) throw uploadError
+        const { data: publicData } = supabase.storage.from('estimate-gallery').getPublicUrl(uploadData.path)
+        galleryUploads.push(publicData.publicUrl)
+      }
+
       const { data, error } = await supabase
         .from('estimates')
         .insert({
@@ -150,6 +188,8 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
           take_description: planDetails.take.description,
           ume_label: planDetails.ume.label,
           ume_description: planDetails.ume.description,
+          gallery_description: galleryDescription.trim() || null,
+          gallery_images: galleryUploads,
           amount: firstActivePrice,
           token,
         })
@@ -159,12 +199,14 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
       if (error) throw error
 
       const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL ||
-        (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
+        process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
       const url = `${baseUrl}/e/${data.token}`
 
       router.refresh()
       event.currentTarget.reset()
+      galleryFiles.forEach((item) => URL.revokeObjectURL(item.preview))
+      setGalleryFiles([])
+      setGalleryDescription('')
       setShareInfo({
         url,
         liffLink: sanitizedLiffBase ? `${sanitizedLiffBase}/${data.token}` : null,
@@ -207,7 +249,9 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-900">プラン金額</p>
+          <p className="text-sm font-semibold text-gray-900">
+            プラン金額 <span className="text-red-500">*</span>
+          </p>
           <button
             type="button"
             onClick={handleAddPlan}
@@ -218,6 +262,7 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
             プランを追加
           </button>
         </div>
+        <p className="text-xs text-gray-500">カード内のプラン名と説明文は自由に編集できます。</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {activePlans.map((planKey) => {
@@ -265,18 +310,71 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
         </div>
       </div>
 
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">現場メモ</p>
+          <p className="text-sm text-gray-500">任意で説明文や参考画像を追加できます（5枚まで）。</p>
+        </div>
+        <textarea
+          placeholder="例: 南面の劣化が著しく、付帯部の補修が必要です。"
+          value={galleryDescription}
+          onChange={(event) => setGalleryDescription(event.target.value)}
+          className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none text-gray-900 placeholder-gray-400"
+          rows={4}
+        />
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {galleryFiles.map((item, index) => (
+              <div key={item.preview} className="relative">
+                <img src={item.preview} alt={`preview-${index}`} className="rounded-2xl border border-gray-200 w-full h-40 object-cover" />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setGalleryFiles((prev) => {
+                      const next = [...prev]
+                      const removed = next.splice(index, 1)[0]
+                      URL.revokeObjectURL(removed.preview)
+                      return next
+                    })
+                  }
+                  className="absolute top-3 right-3 bg-white/80 text-slate-500 hover:text-red-500 rounded-full p-1"
+                  aria-label="画像を削除"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+          {galleryFiles.length < 5 && (
+            <label className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 cursor-pointer">
+              <Plus size={16} />
+              画像をアップロード
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(event) => {
+                  const files = Array.from(event.target.files ?? [])
+                  handleFilesSelected(files)
+                  event.target.value = ''
+                }}
+              />
+            </label>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-base tracking-wide shadow-lg shadow-green-200 flex items-center justify-center gap-3 hover:bg-green-700 transition-colors disabled:opacity-60"
+          className="w-full bg-green-600 text:white py-4 rounded-2xl font-bold text-base tracking-wide shadow-lg shadow-green-200 flex items-center justify-center gap-3 hover:bg-green-700 transition-colors disabled:opacity-60"
         >
           {loading && <Loader2 className="animate-spin h-5 w-5" />}
           {loading ? '発行中...' : '専用URLを発行する'}
         </button>
-        <p className="text-xs text-center text-gray-500">
-          発行と同時にアクセスログを計測し、閲覧状況をダッシュボードで追跡できます。
-        </p>
+        <p className="text-xs text-center text-gray-500">発行と同時にアクセスログを計測し、閲覧状況をダッシュボードで追跡できます。</p>
       </div>
 
       {shareInfo && (
@@ -319,14 +417,10 @@ export default function UploadForm({ userId, liffUrl }: UploadFormProps) {
                   {copiedField === 'liff' ? 'コピー済み' : 'LINEリンクをコピー'}
                 </button>
               </div>
-              <p className="text-xs text-emerald-700 mt-2">
-                LINE公式アカウントからこのリンクを送ると、自動で顧客のLINEと見積が紐づきます。
-              </p>
+              <p className="text-xs text-emerald-700 mt-2">LINE公式アカウントからこのリンクを送ると、自動で顧客のLINEと見積が紐づきます。</p>
             </div>
           ) : (
-            <p className="text-xs text-gray-500">
-              LINE公式アカウントのLIFF URLが未登録のため、共有リンクはWeb版のみです。設定ページでLIFF URLを登録してください。
-            </p>
+            <p className="text-xs text-gray-500">LINE公式アカウントのLIFF URLが未登録のため、共有リンクはWeb版のみです。設定ページでLIFF URLを登録してください。</p>
           )}
         </div>
       )}

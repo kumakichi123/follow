@@ -15,7 +15,7 @@ export default async function CustomerEditPage({ params }: { params: Promise<{ i
   const { data, error } = await supabase
     .from('estimates')
     .select(
-      'id, customer_name, matsu_amount, take_amount, ume_amount, matsu_label, matsu_description, take_label, take_description, ume_label, ume_description'
+      'id, customer_name, matsu_amount, take_amount, ume_amount, matsu_label, matsu_description, take_label, take_description, ume_label, ume_description, gallery_description, gallery_images'
     )
     .eq('id', id)
     .single()
