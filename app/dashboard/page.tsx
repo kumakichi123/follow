@@ -13,6 +13,23 @@ type AccessLogRow = {
   }
 }
 
+type RawAccessLog = {
+  id: string
+  event_type: string
+  created_at: string
+  estimates?:
+    | {
+        customer_name?: string
+        amount?: number | null
+        token?: string
+      }
+    | Array<{
+        customer_name?: string
+        amount?: number | null
+        token?: string
+      }>
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -33,7 +50,7 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(20)
 
-  const logs = (logsData ?? []).map((row: any) => {
+  const logs = (logsData ?? []).map((row: RawAccessLog) => {
     const estimates = Array.isArray(row.estimates) ? row.estimates[0] : row.estimates
     return {
       id: row.id,
